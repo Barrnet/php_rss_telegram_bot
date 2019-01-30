@@ -10,15 +10,16 @@ $max_age_articoli = time() - 1200;
 /* Definisco a FALSE la data di ultimo avvio. Al primo avvio, considera il parametro max_age_articoli */
 $last_send = false;
 $last_send_title = "";
+$dir = dirname(__FILE__);
 
 /* Salvo nei log che il bot è stato avviato */
 $time = date("m-d-y H:i", time());
 $log_text = "[$time] Bot avviato. URL Feed: $rss".PHP_EOL;
-file_put_contents($log_file, $log_text, FILE_APPEND | LOCK_EX);
+file_put_contents($dir."/".$log_file, $log_text, FILE_APPEND | LOCK_EX);
 echo $log_text;
 /* Salvo il PID attuale in un file, cosi che il watchdogs possa controllarlo */
 $pid = getmypid();
-file_put_contents($pid_file, $pid);
+file_put_contents($dir."/".$pid_file, $pid);
 
 /* Funzione invio messaggi alla chat telegram */
 function telegram_send_chat_message($token, $chat, $messaggio) {
@@ -41,7 +42,7 @@ function telegram_send_chat_message($token, $chat, $messaggio) {
 	if ($result == FALSE) {
 		$time = date("m-d-y H:i", time());
 		$log_text = "[$time] Invio messaggio fallito: $messaggio".PHP_EOL;
-		file_put_contents($log_file, $log_text, FILE_APPEND | LOCK_EX);
+		file_put_contents($dir."/".$log_file, $log_text, FILE_APPEND | LOCK_EX);
 	}
 	curl_close($ch);
 }
@@ -56,7 +57,7 @@ while (true) {
 	if ($articoli === false) { 
 		$time = date("m-d-y H:i", $ora_attuale);
 		$log_text = "[$time] Il bot non è riuscito a contattare il Feed RSS. Connessione fallita a $rss.".PHP_EOL;
-		file_put_contents($log_file, $log_text, FILE_APPEND | LOCK_EX);
+		file_put_contents($dir."/".$log_file, $log_text, FILE_APPEND | LOCK_EX);
 	/* Vado avanti solo se $articoli non è in false, ciò vuol dire che simplexml è riuscito a caricare il feed e posso procedere a processare le notizie */	
 	}else{
 		/* Inverto l'ordine delle notizie, da decrescente a crescente */
